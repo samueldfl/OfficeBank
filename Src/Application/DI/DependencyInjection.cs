@@ -1,20 +1,18 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
-using Application.User.Auth.Handlers;
-using Application.User.Auth.Mappers.Abstractions;
-using Application.User.Auth.Handlers.Abstractions;
-using Application.User.Auth.Mappers.Implementations;
-using Infra.Shared.Encrypter.Services.Abstractions;
-using Infra.Shared.Encrypter.Services.Implementations;
+﻿using Application.Transfer.Handlers.Abst;
+using Application.Transfer.Handlers.Impl;
+using Application.User.Handlers.Abst;
+using Application.User.Handlers.Impl;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Application.DI;
 
 public static class DependencyInjection
 {
-    public static void ApplicationPersist(this IServiceCollection services)
+    public static IServiceCollection ApplicationPersist(this IServiceCollection services)
     {
-        services.AddScoped<ICreateUserMapper, CreateUserMapper>();
-        services.AddScoped<IEncrypterService, EncrypterService>();
         services.AddScoped<ICreateUserCommandHandler, CreateUserCommandHandler>();
+        services.AddScoped<ICreateTransferCommandHandler, CreateTransferCommandHandler>();
+
+        return services;
     }
 }
