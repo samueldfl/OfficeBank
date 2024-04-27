@@ -1,4 +1,4 @@
-﻿namespace Infra.Shared.Encrypter.Services.Abstractions;
+﻿namespace Infra.Shared.Encrypter.Abst;
 
 public interface IEncrypterService
 {
