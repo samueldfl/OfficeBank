@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 
-using Application.Shared.Identities;
-using Application.User.Auth.Handlers.Abstractions;
+using Application.User.Handlers.Abst;
+using Application.Shared.ResultStates;
 using Domain.User.Commands;
 
-namespace Api.Controllers;
+namespace Api.User.Controllers;
 
 [Route("[controller]")]
 [ApiController]
@@ -23,15 +23,16 @@ public sealed class UserController : ControllerBase
         CancellationToken cancellationToken
     )
     {
-        Result result = await _createUserCommandHandler.HandleAsync(
+        RootResult result = await _createUserCommandHandler.HandleAsync(
             command,
             cancellationToken
         );
 
-        return result.Code switch
+        return result switch
         {
-            RootStatusCode.CREATED => Created(),
-            _ => StatusCode(500, result.Body),
+            RootCreatedResult => Created(),
+            RootBadRequestResult => BadRequest(result.Body),
+            _ => StatusCode(result.Code, result.Body),
         };
     }
 }

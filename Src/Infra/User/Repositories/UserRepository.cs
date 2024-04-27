@@ -6,28 +6,38 @@ using Infra.Shared.Database.SqlServer.Context;
 
 namespace Infra.User.Repositories;
 
-public class UserRepository : IUserRepository
+internal sealed class UserRepository : IUserRepository
 {
     private readonly SqlServerReadContext _readSqlServerContext;
 
-
     private readonly SqlServerWriteContext _writeSqlServerContext;
 
-    public UserRepository(SqlServerReadContext readSqlServerContext, SqlServerWriteContext writeSqlServerContext)
+    public UserRepository(
+        SqlServerReadContext readSqlServerContext,
+        SqlServerWriteContext writeSqlServerContext
+    )
     {
         _readSqlServerContext = readSqlServerContext;
         _writeSqlServerContext = writeSqlServerContext;
     }
 
-    public async Task<UserModel?> ReadUserAsync(Expression<Func<UserModel, bool>> predicate, CancellationToken cancellationToken = default)
+    public async Task<UserModel?> ReadUserAsync(
+        Expression<Func<UserModel, bool>> predicate,
+        CancellationToken cancellationToken = default
+    )
     {
         try
         {
-
-            UserModel? user = await _readSqlServerContext.Users.FirstOrDefaultAsync(predicate, cancellationToken);
+            UserModel? user = await _readSqlServerContext.Users.FirstOrDefaultAsync(
+                predicate,
+                cancellationToken
+            );
             return user;
         }
-        catch (Exception) { throw new NotImplementedException(); }
+        catch (Exception)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public async Task CreateAsync(

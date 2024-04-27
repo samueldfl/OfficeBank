@@ -1,10 +1,7 @@
-using System.Text;
-
-using Application.Shared.RootRegex;
-using Domain.Shared.Command;
-using Domain.Shared.Identities;
-using Domain.User.Notifications.Auth;
+using Domain.Shared.Commands;
+using Domain.Shared.ValidationStates;
 using Domain.User.Records;
+using Domain.User.Validators;
 
 namespace Domain.User.Commands;
 
@@ -16,82 +13,20 @@ public record CreateUserCommand(
     UserAddress Address
 ) : ICommand
 {
-    public Notifier Validate()
+    public ValidationState Validate()
     {
-        Notifier notifier = new();
-
-        List<Notification?> result =
-        [
-            ValidateName,
-            ValidateEmail,
-            ValidateCpf,
-            ValidatePassword,
-        ];
-
-        foreach (var notification in result)
+        CreateUserCommandValidator validator = new();
+        var result = validator.Validate(this);
+        if (!result.IsValid)
         {
-            if (notification is not null)
+            Dictionary<string, string> errors = [];
+            foreach (var err in result.Errors)
             {
-                notifier.Notifications.Add(notification);
+                errors[err.PropertyName] = err.ErrorMessage;
             }
+            return new FailureValidationState() { Body = errors };
         }
 
-        return notifier;
-    }
-
-    private Notification? ValidateName
-    {
-        get
-        {
-            if (RootRegex.SpecialChar().IsMatch(Name) || RootRegex.Number().IsMatch(Name))
-                return new InvalidNameNotification();
-            return null;
-        }
-    }
-
-    private Notification? ValidateEmail
-    {
-        get
-        {
-            if (!RootRegex.Email().IsMatch(Email))
-                return new InvalidEmailNotification();
-            return null;
-        }
-    }
-
-    private Notification? ValidateCpf
-    {
-        get
-        {
-            if (!RootRegex.Base64().IsMatch(CPF))
-                return new Notification("", "");
-
-            string cpf = Convert.ToBase64String(Encoding.UTF8.GetBytes(CPF));
-            return null;
-        }
-    }
-
-    private Notification? ValidatePassword
-    {
-        get
-        {
-            if (!RootRegex.Base64().IsMatch(Password))
-                return new InvalidPasswordNotification();
-
-            string password = Convert.ToBase64String(
-                Encoding.UTF8.GetBytes(Password)
-            );
-
-            if (
-                !RootRegex.SpecialChar().IsMatch(password)
-                || !RootRegex.UpperCase().IsMatch(password)
-                || !RootRegex.Number().IsMatch(password)
-                || password.Length < 8
-                || password.Length > 32
-            )
-                return new InvalidPasswordNotification();
-
-            return null;
-        }
+        return new SucessValidationState();
     }
 };

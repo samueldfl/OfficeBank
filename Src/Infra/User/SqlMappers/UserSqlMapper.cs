@@ -11,32 +11,88 @@ public sealed class UserSqlMapper : IEntityTypeConfiguration<UserModel>
     {
         builder.ToTable("Users");
 
-        builder.HasKey(p => p.Id);
+        builder.HasKey(user => user.Id);
         builder
-            .Property(p => p.Id)
+            .Property(user => user.Id)
             .HasColumnType("uniqueidentifier")
             .HasDefaultValueSql("NEWID()");
 
-        builder.Property(p => p.Name).HasColumnType("varchar(40)").IsRequired();
+        builder
+            .Property(user => user.Name)
+            .HasColumnType("varchar")
+            .HasMaxLength(60)
+            .IsRequired();
 
-        builder.HasIndex(p => p.Email).IsUnique();
-        builder.Property(p => p.Email).HasColumnType("varchar(60)");
+        builder.HasIndex(user => user.Email).IsUnique();
+        builder.Property(user => user.Email).HasColumnType("varchar").HasMaxLength(256);
 
-        builder.Property(p => p.Password).HasColumnType("varchar(60)");
+        builder.Property(user => user.Password).HasColumnType("varchar").HasMaxLength(60);
 
-        builder.HasIndex(p => p.CPF).IsUnique();
-        builder.Property(p => p.CPF).HasColumnType("varchar(60)");
+        builder.HasIndex(user => user.CPF).IsUnique();
+        builder.Property(user => user.CPF).HasColumnType("varchar").HasMaxLength(60);
 
         builder
-            .Property(p => p.CreatedAt)
+            .Property(user => user.CreatedAt)
             .HasColumnType("datetime2")
             .HasDefaultValueSql("SYSDATETIME()");
 
         builder
-            .Property(p => p.UpdatedAt)
+            .Property(user => user.UpdatedAt)
             .HasColumnType("datetime2")
             .HasDefaultValueSql("SYSDATETIME()");
 
-        builder.Property(p => p.DeleteAt).HasColumnType("datetime2");
+        builder.Property(user => user.DeleteAt).HasColumnType("datetime2");
+        builder.HasQueryFilter(user => user.DeleteAt != null);
+
+        builder.OwnsOne(
+            address => address.Address,
+            builder =>
+            {
+                builder
+                    .Property(address => address.Id)
+                    .HasColumnType("uniqueidentifier")
+                    .HasDefaultValueSql("NEWID()");
+
+                builder
+                    .Property(address => address.Street)
+                    .HasColumnType("varchar")
+                    .IsRequired();
+
+                builder
+                    .Property(address => address.Number)
+                    .HasColumnType("varchar")
+                    .IsRequired();
+
+                builder
+                    .Property(address => address.ZipCode)
+                    .HasColumnType("varchar")
+                    .HasMaxLength(8)
+                    .IsRequired();
+
+                builder
+                    .Property(address => address.Neighborhood)
+                    .HasColumnType("varchar")
+                    .IsRequired();
+
+                builder
+                    .Property(address => address.City)
+                    .HasColumnType("varchar")
+                    .IsRequired();
+
+                builder
+                    .Property(address => address.State)
+                    .HasColumnType("varchar")
+                    .IsRequired();
+
+                builder
+                    .Property(address => address.Country)
+                    .HasColumnType("varchar")
+                    .IsRequired();
+
+                builder
+                    .WithOwner(address => address.User)
+                    .HasForeignKey(address => address.UserId);
+            }
+        );
     }
 }
