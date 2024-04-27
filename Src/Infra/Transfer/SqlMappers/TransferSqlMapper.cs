@@ -1,7 +1,6 @@
+using Domain.Transfer.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-
-using Domain.Transfer.Models;
 
 namespace Infra.Account.SqlMappers;
 
@@ -11,22 +10,22 @@ public sealed class TransferSqlMapper : IEntityTypeConfiguration<TransferModel>
     {
         builder.ToTable("Transfers");
 
-        builder.HasKey(p => p.Id);
+        builder.HasKey(transfer => transfer.Id);
         builder
-            .Property(p => p.Id)
+            .Property(transfer => transfer.Id)
             .HasColumnType("uniqueidentifier")
             .HasDefaultValueSql("NEWID()");
 
         builder
-            .HasOne(p => p.FromAccount)
-            .WithMany(p => p.Transfers)
-            .HasForeignKey(p => p.FromAccountId);
+            .Property(transfer => transfer.ToAccountId)
+            .HasColumnType("uniqueidentifier")
+            .IsRequired();
 
         builder
-            .HasOne(p => p.ToAccount)
-            .WithMany(p => p.Transfers)
-            .HasForeignKey(p => p.ToAccountId);
+            .Property(transfer => transfer.FromAccountId)
+            .HasColumnType("uniqueidentifier")
+            .IsRequired();
 
-        builder.HasMany(p => p.Accounts).WithMany(p => p.Transfers);
+        builder.Property(transfer => transfer.Amount).HasPrecision(19, 5);
     }
 }
