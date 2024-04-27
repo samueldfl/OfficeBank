@@ -21,8 +21,4 @@
 		<ProjectReference Include="..\Domain\Domain.csproj" />
 		<ProjectReference Include="..\Infra\Infra.csproj" />
 	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="User\" />
-	</ItemGroup>
 </Project>
