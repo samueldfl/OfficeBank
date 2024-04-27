@@ -1,25 +1,36 @@
 ﻿using Domain.Account.Models;
+using Domain.Payment.Models;
 using Domain.Transfer.Models;
 using Domain.User.Models;
+using Infra.Shared.Database.SqlServer.Settings;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infra.Shared.Database.SqlServer.Context;
 
-public class SqlServerReadContext : DbContext
+internal sealed class SqlServerReadContext : DbContext
 {
-    public SqlServerReadContext(DbContextOptions options) : 
-        base(options) { }
+    private readonly SqlServerConnectionString _sqlServerConnectionString;
+
+    public SqlServerReadContext(
+        DbContextOptions<SqlServerReadContext> options,
+        SqlServerConnectionString sqlServerConnectionString
+    )
+        : base(options)
+    {
+        _sqlServerConnectionString = sqlServerConnectionString;
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(SqlServerWriteContext).Assembly, WriteConfigurationsFilter);
+        modelBuilder.ApplyConfigurationsFromAssembly(
+            typeof(SqlServerWriteContext).Assembly,
+            WriteConfigurationsFilter
+        );
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseSqlServer(
-            @"Server=localhost;User Id=sa;Password=@Sdfl29052003;Encrypt=True;Database=PROJETO_DB;TrustServerCertificate=True"
-        );
+        optionsBuilder.UseSqlServer(_sqlServerConnectionString.ToString());
     }
 
     private static bool WriteConfigurationsFilter(Type type) =>
@@ -27,9 +38,9 @@ public class SqlServerReadContext : DbContext
 
     public DbSet<UserModel> Users { get; set; }
 
-    public DbSet<UserAddressModel> Addresses { get; set; }
-
     public DbSet<AccountModel> Accounts { get; set; }
 
     public DbSet<TransferModel> Transfers { get; set; }
+
+    public DbSet<TransactionModel> Transactions { get; set; }
 }
