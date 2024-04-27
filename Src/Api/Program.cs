@@ -1,3 +1,4 @@
+using Api.Settings;
 using Application.DI;
 using Infra.DI;
 
@@ -7,8 +8,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.ApplicationPersist();
-builder.Services.InfraPersist();
+builder.Services.AddRequestRateLimit();
+
+builder.Services.ApplicationPersist().InfraPersist(builder.Configuration);
 
 var app = builder.Build();
 
@@ -19,6 +21,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseRateLimiter();
 
 app.UseAuthorization();
 
