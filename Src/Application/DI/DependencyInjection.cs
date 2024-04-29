@@ -1,4 +1,6 @@
-﻿using Application.Transfer.Handlers.Abst;
+﻿using Application.Transaction.Handlers.Abst;
+using Application.Transaction.Handlers.Impl;
+using Application.Transfer.Handlers.Abst;
 using Application.Transfer.Handlers.Impl;
 using Application.User.Handlers.Abst;
 using Application.User.Handlers.Impl;
@@ -12,6 +14,7 @@ public static class DependencyInjection
     {
         services.AddScoped<ICreateUserCommandHandler, CreateUserCommandHandler>();
         services.AddScoped<ICreateTransferCommandHandler, CreateTransferCommandHandler>();
+        services.AddScoped<IDepositCommandHandler, DepositCommandHandler>();
 
         return services;
     }

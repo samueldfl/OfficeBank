@@ -3,17 +3,17 @@ using Application.Transfer.Handlers.Abst;
 using Domain.Account.Models;
 using Domain.Account.Repositories;
 using Domain.Payment.Models;
+using Domain.Shared.Services.EventBus;
+using Domain.Shared.Services.UnitOfWork;
 using Domain.Shared.ValidationStates;
 using Domain.Transaction.Repositories;
 using Domain.Transfer.Commands;
 using Domain.Transfer.Models;
 using Domain.Transfer.Repositories;
-using Infra.Shared.Database.UnitOfWork;
-using Infra.Shared.Messengers.EventBus;
 
 namespace Application.Transfer.Handlers.Impl;
 
-public class CreateTransferCommandHandler : ICreateTransferCommandHandler
+internal class CreateTransferCommandHandler : ICreateTransferCommandHandler
 {
     private readonly IAccountRepository _accountRepository;
 
@@ -21,16 +21,16 @@ public class CreateTransferCommandHandler : ICreateTransferCommandHandler
 
     private readonly ITransactionRepository _transactionRepository;
 
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IUnitOfWorkService _unitOfWork;
 
-    private readonly IEventBus _eventBus;
+    private readonly IEventBusService _eventBus;
 
     public CreateTransferCommandHandler(
         IAccountRepository accountRepository,
         ITransferRepository transferRepository,
         ITransactionRepository transactionRepository,
-        IUnitOfWork unitOfWork,
-        IEventBus eventBus
+        IUnitOfWorkService unitOfWork,
+        IEventBusService eventBus
     )
     {
         _accountRepository = accountRepository;
@@ -55,7 +55,7 @@ public class CreateTransferCommandHandler : ICreateTransferCommandHandler
         try
         {
             AccountModel fromAccount =
-                await _accountRepository.GetAccountAsNoTrackingAsync(
+                await _accountRepository.ReadAccountAsNoTrackingAsync(
                     account => account.Id == Guid.Parse(command.FromAccountId),
                     cancellationToken
                 );
@@ -74,10 +74,11 @@ public class CreateTransferCommandHandler : ICreateTransferCommandHandler
                 return new RootUnauthorizedResult();
             }
 
-            AccountModel toAccount = await _accountRepository.GetAccountAsNoTrackingAsync(
-                account => account.Id == Guid.Parse(command.ToAccountId),
-                cancellationToken
-            );
+            AccountModel toAccount =
+                await _accountRepository.ReadAccountAsNoTrackingAsync(
+                    account => account.Id == Guid.Parse(command.ToAccountId),
+                    cancellationToken
+                );
 
             TransactionModel toAccountLastTransaction =
                 await _transactionRepository.GetLastAccountTransactionAsNoTrackingAsync(

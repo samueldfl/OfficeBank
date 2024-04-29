@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
 using Domain.Payment.Models;
 using Domain.Transaction.Repositories;
-using Infra.Shared.Database.SqlServer.Context;
+using Infra.Shared.SqlServer.Context;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infra.Transaction.Repositories;

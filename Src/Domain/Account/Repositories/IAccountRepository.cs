@@ -5,12 +5,12 @@ namespace Domain.Account.Repositories;
 
 public interface IAccountRepository
 {
-    Task<AccountModel> GetAccountAsync(
+    Task<AccountModel> ReadAccountAsync(
         Expression<Func<AccountModel, bool>> predicate,
         CancellationToken cancellationToken = default
     );
 
-    Task<AccountModel> GetAccountAsNoTrackingAsync(
+    Task<AccountModel> ReadAccountAsNoTrackingAsync(
         Expression<Func<AccountModel, bool>> predicate,
         CancellationToken cancellationToken = default
     );

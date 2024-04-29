@@ -1,11 +1,11 @@
 using Application.Shared.ResultStates;
 using Application.User.Handlers.Abst;
+using Domain.Shared.Encrypter;
+using Domain.Shared.Services.UnitOfWork;
 using Domain.Shared.ValidationStates;
 using Domain.User.Commands;
 using Domain.User.Models;
 using Domain.User.Repositories;
-using Infra.Shared.Database.UnitOfWork;
-using Infra.Shared.Encrypter.Abst;
 
 namespace Application.User.Handlers.Impl;
 
@@ -15,17 +15,17 @@ public class CreateUserCommandHandler : ICreateUserCommandHandler
 
     private readonly IEncrypterService _encrypterService;
 
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IUnitOfWorkService _unitOfWorkService;
 
     public CreateUserCommandHandler(
         IUserRepository userRepository,
         IEncrypterService encrypterService,
-        IUnitOfWork unitOfWork
+        IUnitOfWorkService unitOfWorkService
     )
     {
         _userRepository = userRepository;
         _encrypterService = encrypterService;
-        _unitOfWork = unitOfWork;
+        _unitOfWorkService = unitOfWorkService;
     }
 
     public async Task<RootResult> HandleAsync(
@@ -45,7 +45,7 @@ public class CreateUserCommandHandler : ICreateUserCommandHandler
             user.Password = _encrypterService.Hash(user.Password);
             user.CPF = _encrypterService.Hash(user.CPF);
             await _userRepository.CreateAsync(user, cancellationToken);
-            await _unitOfWork.CommitAsync(cancellationToken);
+            await _unitOfWorkService.CommitAsync(cancellationToken);
             return new RootCreatedResult();
         }
         catch (Exception e)

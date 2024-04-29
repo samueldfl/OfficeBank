@@ -1,12 +1,11 @@
-using Microsoft.AspNetCore.Mvc;
-
-using Application.User.Handlers.Abst;
 using Application.Shared.ResultStates;
+using Application.User.Handlers.Abst;
 using Domain.User.Commands;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Api.User.Controllers;
 
-[Route("[controller]")]
+[Route("Api/[controller]")]
 [ApiController]
 public sealed class UserController : ControllerBase
 {
@@ -17,7 +16,7 @@ public sealed class UserController : ControllerBase
         _createUserCommandHandler = createUserCommandHandler;
     }
 
-    [HttpPost("/register")]
+    [HttpPost("v{version:apiVersion}/register")]
     public async Task<IActionResult> Register(
         CreateUserCommand command,
         CancellationToken cancellationToken

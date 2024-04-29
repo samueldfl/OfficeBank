@@ -8,7 +8,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddRequestRateLimit();
+builder.Services.EnableApiVersioning().AddRequestRateLimit();
 
 builder.Services.ApplicationPersist().InfraPersist(builder.Configuration);
 

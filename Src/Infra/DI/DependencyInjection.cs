@@ -1,22 +1,21 @@
 ﻿using Domain.Account.Repositories;
+using Domain.Shared.Encrypter;
+using Domain.Shared.Services.EventBus;
+using Domain.Shared.Services.UnitOfWork;
 using Domain.Transaction.Repositories;
 using Domain.Transfer.Repositories;
 using Domain.User.Repositories;
 using Infra.Account.Repositories;
-using Infra.Shared.Database.SqlServer.Context;
-using Infra.Shared.Database.SqlServer.Settings;
-using Infra.Shared.Database.SqlServer.UnitOfWork;
-using Infra.Shared.Database.UnitOfWork;
-using Infra.Shared.Encrypter.Abst;
-using Infra.Shared.Encrypter.Impl;
-using Infra.Shared.Messengers.EventBus;
+using Infra.Shared.Encrypter;
 using Infra.Shared.Messengers.RabbitMQ.Config;
 using Infra.Shared.Messengers.RabbitMQ.EventBus;
+using Infra.Shared.SqlServer.Context;
+using Infra.Shared.SqlServer.Settings;
+using Infra.Shared.SqlServer.UnitOfWork;
 using Infra.Transaction.Repositories;
 using Infra.Transfer.Repositories;
 using Infra.User.Repositories;
 using MassTransit;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -29,9 +28,7 @@ public static class DependencyInjection
         IConfiguration configuration
     )
     {
-        services.AddDbContext<SqlServerReadContext>(options =>
-            options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
-        );
+        services.AddDbContext<SqlServerReadContext>();
         services.AddDbContext<SqlServerWriteContext>();
 
         services.AddSingleton(
@@ -68,8 +65,8 @@ public static class DependencyInjection
             );
         });
 
-        services.AddScoped<IEventBus, RabbitMQEventBus>();
-        services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IEventBusService, RabbitMQEventBus>();
+        services.AddScoped<IUnitOfWorkService, UnitOfWorkSqlServerService>();
         services.AddScoped<IEncrypterService, EncrypterService>();
 
         services.AddScoped<IUserRepository, UserRepository>();

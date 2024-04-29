@@ -1,13 +1,13 @@
-﻿using Infra.Shared.Database.SqlServer.Context;
-using Infra.Shared.Database.UnitOfWork;
+﻿using Domain.Shared.Services.UnitOfWork;
+using Infra.Shared.SqlServer.Context;
 
-namespace Infra.Shared.Database.SqlServer.UnitOfWork;
+namespace Infra.Shared.SqlServer.UnitOfWork;
 
-internal class UnitOfWork : IUnitOfWork
+internal class UnitOfWorkSqlServerService : IUnitOfWorkService
 {
     private readonly SqlServerWriteContext _sqlContext;
 
-    public UnitOfWork(SqlServerWriteContext sqlContext)
+    public UnitOfWorkSqlServerService(SqlServerWriteContext sqlContext)
     {
         _sqlContext = sqlContext;
     }

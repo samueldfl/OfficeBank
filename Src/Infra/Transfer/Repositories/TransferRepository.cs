@@ -1,6 +1,6 @@
 using Domain.Transfer.Models;
 using Domain.Transfer.Repositories;
-using Infra.Shared.Database.SqlServer.Context;
+using Infra.Shared.SqlServer.Context;
 
 namespace Infra.Transfer.Repositories;
 

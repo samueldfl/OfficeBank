@@ -11,6 +11,6 @@ public record CreateTransferCommand(
 {
     public ValidationState Validate()
     {
-        return new SucessValidationState();
+        return new FailureValidationState();
     }
 }

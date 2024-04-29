@@ -1,6 +1,7 @@
 using Application.Shared.ResultStates;
 using Application.Transaction.Commands;
 using Application.Transaction.Handlers;
+using Application.Transaction.Handlers.Abst;
 using Application.Transfer.Handlers.Abst;
 using Domain.Transfer.Commands;
 using Microsoft.AspNetCore.Mvc;
@@ -14,11 +15,11 @@ public sealed class TransferController : ControllerBase
 {
     private readonly ICreateTransferCommandHandler _createTransferCommandHandler;
 
-    private readonly DepositCommandHandler _depositCommandHandler;
+    private readonly IDepositCommandHandler _depositCommandHandler;
 
     public TransferController(
         ICreateTransferCommandHandler createTransferCommandHandler,
-        DepositCommandHandler depositCommandHandler
+        IDepositCommandHandler depositCommandHandler
     )
     {
         _createTransferCommandHandler = createTransferCommandHandler;
