@@ -12,12 +12,10 @@ internal static class RequestRateLimit
                 "fixed",
                 context =>
                     RateLimitPartition.GetFixedWindowLimiter(
-                        partitionKey: context.Connection.RemoteIpAddress,
+                        partitionKey: context.Connection.RemoteIpAddress?.ToString(),
                         factory: partition => new FixedWindowRateLimiterOptions
                         {
-                            AutoReplenishment = true,
                             PermitLimit = 5,
-                            QueueLimit = 0,
                             Window = TimeSpan.FromMinutes(45)
                         }
                     )
