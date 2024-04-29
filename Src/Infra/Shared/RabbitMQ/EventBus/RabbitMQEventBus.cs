@@ -1,9 +1,9 @@
-using Infra.Shared.Messengers.EventBus;
+using Domain.Shared.Services.EventBus;
 using MassTransit;
 
 namespace Infra.Shared.Messengers.RabbitMQ.EventBus;
 
-internal sealed class RabbitMQEventBus : IEventBus
+internal sealed class RabbitMQEventBus : IEventBusService
 {
     private readonly IPublishEndpoint _publishEndpoint;
 
