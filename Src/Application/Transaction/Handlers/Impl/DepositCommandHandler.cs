@@ -1,27 +1,28 @@
 ﻿using Application.Shared.CommandHandlers;
 using Application.Shared.ResultStates;
 using Application.Transaction.Commands;
+using Application.Transaction.Handlers.Abst;
 using Domain.Account.Models;
 using Domain.Account.Repositories;
 using Domain.Payment.Models;
+using Domain.Shared.Services.UnitOfWork;
 using Domain.Shared.ValidationStates;
 using Domain.Transaction.Repositories;
-using Infra.Shared.Database.UnitOfWork;
 
-namespace Application.Transaction.Handlers;
+namespace Application.Transaction.Handlers.Impl;
 
-public sealed class DepositCommandHandler : ICommandHandler<DepositCommand>
+internal sealed class DepositCommandHandler : IDepositCommandHandler
 {
     private readonly IAccountRepository _accountRepository;
 
     private readonly ITransactionRepository _transactionRepository;
 
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IUnitOfWorkService _unitOfWork;
 
     public DepositCommandHandler(
         IAccountRepository accountRepository,
         ITransactionRepository transactionRepository,
-        IUnitOfWork unitOfWork
+        IUnitOfWorkService unitOfWork
     )
     {
         _accountRepository = accountRepository;
@@ -43,10 +44,11 @@ public sealed class DepositCommandHandler : ICommandHandler<DepositCommand>
 
         try
         {
-            AccountModel toAccount = await _accountRepository.GetAccountAsNoTrackingAsync(
-                account => account.Id == Guid.Parse(command.ToAccountId),
-                cancellationToken
-            );
+            AccountModel toAccount =
+                await _accountRepository.ReadAccountAsNoTrackingAsync(
+                    account => account.Id == Guid.Parse(command.ToAccountId),
+                    cancellationToken
+                );
 
             TransactionModel lastTransaction =
                 await _transactionRepository.GetLastAccountTransactionAsNoTrackingAsync(
