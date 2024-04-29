@@ -1,4 +1,4 @@
-﻿namespace Infra.Shared.Encrypter.Abst;
+﻿namespace Domain.Shared.Encrypter;
 
 public interface IEncrypterService
 {
