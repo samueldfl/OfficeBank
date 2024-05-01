@@ -16,7 +16,7 @@ internal static class RequestRateLimit
                         factory: partition => new FixedWindowRateLimiterOptions
                         {
                             PermitLimit = 5,
-                            Window = TimeSpan.FromMinutes(45)
+                            Window = TimeSpan.FromSeconds(45)
                         }
                     )
             );
