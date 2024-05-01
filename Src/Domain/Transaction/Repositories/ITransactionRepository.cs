@@ -5,17 +5,9 @@ namespace Domain.Transaction.Repositories;
 
 public interface ITransactionRepository
 {
-    Task CreateTransactionAsync(
-        TransactionModel transactionModel,
-        CancellationToken cancellationToken = default
-    );
+    void Create(TransactionModel transactionModel);
 
-    Task<TransactionModel> GetLastAccountTransactionAsync(
-        Expression<Func<TransactionModel, bool>> predicate,
-        CancellationToken cancellationToken = default
-    );
-
-    Task<TransactionModel> GetLastAccountTransactionAsNoTrackingAsync(
+    Task<TransactionModel> ReadLastAsNoTrackingAsync(
         Expression<Func<TransactionModel, bool>> predicate,
         CancellationToken cancellationToken = default
     );

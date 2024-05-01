@@ -4,20 +4,13 @@ using Infra.Shared.SqlServer.Context;
 
 namespace Infra.Transfer.Repositories;
 
-internal class TransferRepository : ITransferRepository
+internal class TransferRepository(SqlServerWriteContext sqlServerWriteContext)
+    : ITransferRepository
 {
-    private readonly SqlServerWriteContext _sqlWriteContext;
+    private readonly SqlServerWriteContext _sqlServerWriteContext = sqlServerWriteContext;
 
-    public TransferRepository(SqlServerWriteContext sqlWriteContext)
+    public void Create(TransferModel model)
     {
-        _sqlWriteContext = sqlWriteContext;
-    }
-
-    public async Task CreateAsync(
-        TransferModel model,
-        CancellationToken cancellationToken = default
-    )
-    {
-        await _sqlWriteContext.Transfers.AddAsync(model, cancellationToken);
+        _sqlServerWriteContext.Transfers.Add(model);
     }
 }

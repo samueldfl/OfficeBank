@@ -6,44 +6,20 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infra.Transaction.Repositories;
 
-internal sealed class TransactionRepository : ITransactionRepository
+internal sealed class TransactionRepository(
+    SqlServerReadContext sqlServerReadContext,
+    SqlServerWriteContext sqlServerWriteContext
+) : ITransactionRepository
 {
-    private readonly SqlServerReadContext _sqlServerReadContext;
-    private readonly SqlServerWriteContext _sqlServerWriteContext;
+    private readonly SqlServerReadContext _sqlServerReadContext = sqlServerReadContext;
+    private readonly SqlServerWriteContext _sqlServerWriteContext = sqlServerWriteContext;
 
-    public TransactionRepository(
-        SqlServerReadContext sqlServerReadContext,
-        SqlServerWriteContext sqlServerWriteContext
-    )
+    public void Create(TransactionModel model)
     {
-        _sqlServerReadContext = sqlServerReadContext;
-        _sqlServerWriteContext = sqlServerWriteContext;
+        _sqlServerWriteContext.Transactions.Add(model);
     }
 
-    public async Task CreateTransactionAsync(
-        TransactionModel model,
-        CancellationToken cancellationToken = default
-    )
-    {
-        await _sqlServerWriteContext.Transactions.AddAsync(model, cancellationToken);
-    }
-
-    public async Task<TransactionModel> GetLastAccountTransactionAsync(
-        Expression<Func<TransactionModel, bool>> predicate,
-        CancellationToken cancellationToken = default
-    )
-    {
-        TransactionModel transaction =
-            await _sqlServerWriteContext
-                .Transactions.AsQueryable()
-                .OrderByDescending(transaction => transaction.CreatedAt)
-                .FirstOrDefaultAsync(predicate, cancellationToken: cancellationToken)
-            ?? throw new Exception();
-
-        return transaction;
-    }
-
-    public async Task<TransactionModel> GetLastAccountTransactionAsNoTrackingAsync(
+    public async Task<TransactionModel> ReadLastAsNoTrackingAsync(
         Expression<Func<TransactionModel, bool>> predicate,
         CancellationToken cancellationToken = default
     )

@@ -13,32 +13,24 @@ using Domain.Transfer.Repositories;
 
 namespace Application.Transfer.Handlers.Impl;
 
-internal class CreateTransferCommandHandler : ICreateTransferCommandHandler
+public sealed class CreateTransferCommandHandler(
+    IAccountRepository accountRepository,
+    ITransferRepository transferRepository,
+    ITransactionRepository transactionRepository,
+    IUnitOfWorkService unitOfWork,
+    IEventBusService eventBus
+) : ICreateTransferCommandHandler
 {
-    private readonly IAccountRepository _accountRepository;
+    private readonly IAccountRepository _accountRepository = accountRepository;
 
-    private readonly ITransferRepository _transferRepository;
+    private readonly ITransferRepository _transferRepository = transferRepository;
 
-    private readonly ITransactionRepository _transactionRepository;
+    private readonly ITransactionRepository _transactionRepository =
+        transactionRepository;
 
-    private readonly IUnitOfWorkService _unitOfWork;
+    private readonly IUnitOfWorkService _unitOfWork = unitOfWork;
 
-    private readonly IEventBusService _eventBus;
-
-    public CreateTransferCommandHandler(
-        IAccountRepository accountRepository,
-        ITransferRepository transferRepository,
-        ITransactionRepository transactionRepository,
-        IUnitOfWorkService unitOfWork,
-        IEventBusService eventBus
-    )
-    {
-        _accountRepository = accountRepository;
-        _transactionRepository = transactionRepository;
-        _transferRepository = transferRepository;
-        _unitOfWork = unitOfWork;
-        _eventBus = eventBus;
-    }
+    private readonly IEventBusService _eventBus = eventBus;
 
     public async Task<RootResult> HandleAsync(
         CreateTransferCommand command,
@@ -54,14 +46,13 @@ internal class CreateTransferCommandHandler : ICreateTransferCommandHandler
 
         try
         {
-            AccountModel fromAccount =
-                await _accountRepository.ReadAccountAsNoTrackingAsync(
-                    account => account.Id == Guid.Parse(command.FromAccountId),
-                    cancellationToken
-                );
+            AccountModel fromAccount = await _accountRepository.ReadAsNoTrackingAsync(
+                account => account.Id == Guid.Parse(command.FromAccountId),
+                cancellationToken
+            );
 
             TransactionModel fromAccountLastTransaction =
-                await _transactionRepository.GetLastAccountTransactionAsNoTrackingAsync(
+                await _transactionRepository.ReadLastAsNoTrackingAsync(
                     account => account.AccountId == fromAccount.Id,
                     cancellationToken
                 );
@@ -74,14 +65,13 @@ internal class CreateTransferCommandHandler : ICreateTransferCommandHandler
                 return new RootUnauthorizedResult();
             }
 
-            AccountModel toAccount =
-                await _accountRepository.ReadAccountAsNoTrackingAsync(
-                    account => account.Id == Guid.Parse(command.ToAccountId),
-                    cancellationToken
-                );
+            AccountModel toAccount = await _accountRepository.ReadAsNoTrackingAsync(
+                account => account.Id == Guid.Parse(command.ToAccountId),
+                cancellationToken
+            );
 
             TransactionModel toAccountLastTransaction =
-                await _transactionRepository.GetLastAccountTransactionAsNoTrackingAsync(
+                await _transactionRepository.ReadLastAsNoTrackingAsync(
                     transaction => transaction.AccountId == toAccount.Id,
                     cancellationToken
                 );
@@ -95,10 +85,7 @@ internal class CreateTransferCommandHandler : ICreateTransferCommandHandler
                     AccountId = fromAccountLastTransaction.AccountId
                 };
 
-            await _transactionRepository.CreateTransactionAsync(
-                newFromAccountTransaction,
-                cancellationToken
-            );
+            _transactionRepository.Create(newFromAccountTransaction);
 
             TransactionModel newToAccountTransaction =
                 new()
@@ -109,10 +96,7 @@ internal class CreateTransferCommandHandler : ICreateTransferCommandHandler
                     AccountId = toAccountLastTransaction.AccountId
                 };
 
-            await _transactionRepository.CreateTransactionAsync(
-                newToAccountTransaction,
-                cancellationToken
-            );
+            _transactionRepository.Create(newToAccountTransaction);
 
             TransferModel transfer =
                 new()
@@ -122,7 +106,7 @@ internal class CreateTransferCommandHandler : ICreateTransferCommandHandler
                     ToAccountId = toAccount.Id,
                 };
 
-            await _transferRepository.CreateAsync(transfer, cancellationToken);
+            _transferRepository.Create(transfer);
             await _unitOfWork.CommitAsync(cancellationToken);
             await _eventBus.PublishAsync(transfer, cancellationToken);
 

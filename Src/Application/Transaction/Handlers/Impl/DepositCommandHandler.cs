@@ -11,24 +11,18 @@ using Domain.Transaction.Repositories;
 
 namespace Application.Transaction.Handlers.Impl;
 
-internal sealed class DepositCommandHandler : IDepositCommandHandler
+internal sealed class DepositCommandHandler(
+    IAccountRepository accountRepository,
+    ITransactionRepository transactionRepository,
+    IUnitOfWorkService unitOfWork
+) : IDepositCommandHandler
 {
-    private readonly IAccountRepository _accountRepository;
+    private readonly IAccountRepository _accountRepository = accountRepository;
 
-    private readonly ITransactionRepository _transactionRepository;
+    private readonly ITransactionRepository _transactionRepository =
+        transactionRepository;
 
-    private readonly IUnitOfWorkService _unitOfWork;
-
-    public DepositCommandHandler(
-        IAccountRepository accountRepository,
-        ITransactionRepository transactionRepository,
-        IUnitOfWorkService unitOfWork
-    )
-    {
-        _accountRepository = accountRepository;
-        _transactionRepository = transactionRepository;
-        _unitOfWork = unitOfWork;
-    }
+    private readonly IUnitOfWorkService _unitOfWork = unitOfWork;
 
     public async Task<RootResult> HandleAsync(
         DepositCommand command,
@@ -45,13 +39,13 @@ internal sealed class DepositCommandHandler : IDepositCommandHandler
         try
         {
             AccountModel toAccount =
-                await _accountRepository.ReadAccountAsNoTrackingAsync(
+                await _accountRepository.ReadAsNoTrackingAsync(
                     account => account.Id == Guid.Parse(command.ToAccountId),
                     cancellationToken
                 );
 
             TransactionModel lastTransaction =
-                await _transactionRepository.GetLastAccountTransactionAsNoTrackingAsync(
+                await _transactionRepository.ReadLastAsNoTrackingAsync(
                     account => account.Id == Guid.Parse(command.ToAccountId),
                     cancellationToken
                 );
@@ -65,11 +59,7 @@ internal sealed class DepositCommandHandler : IDepositCommandHandler
                     AccountId = toAccount.Id,
                 };
 
-            await _transactionRepository.CreateTransactionAsync(
-                depositTransaction,
-                cancellationToken
-            );
-
+            _transactionRepository.Create(depositTransaction);
             await _unitOfWork.CommitAsync(cancellationToken);
 
             return new RootOkResult();

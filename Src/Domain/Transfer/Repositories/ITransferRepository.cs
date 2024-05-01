@@ -4,5 +4,5 @@ namespace Domain.Transfer.Repositories;
 
 public interface ITransferRepository
 {
-    Task CreateAsync(TransferModel model, CancellationToken cancellationToken = default);
+    void Create(TransferModel model);
 }

@@ -5,10 +5,10 @@ namespace Domain.User.Repositories;
 
 public interface IUserRepository
 {
+    void Create(UserModel model);
+
     Task<UserModel?> ReadUserAsync(
         Expression<Func<UserModel, bool>> predicate,
         CancellationToken cancellationToken = default
     );
-
-    Task CreateAsync(UserModel model, CancellationToken cancellationToken = default);
 }

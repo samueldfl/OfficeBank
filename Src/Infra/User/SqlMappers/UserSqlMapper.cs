@@ -45,7 +45,7 @@ public sealed class UserSqlMapper : IEntityTypeConfiguration<UserModel>
         builder.HasQueryFilter(user => user.DeleteAt != null);
 
         builder.OwnsOne(
-            address => address.Address,
+            user => user.Address,
             builder =>
             {
                 builder

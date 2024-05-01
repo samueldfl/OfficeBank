@@ -6,29 +6,20 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infra.User.Repositories;
 
-internal sealed class UserRepository : IUserRepository
+internal sealed class UserRepository(
+    SqlServerReadContext readSqlServerContext,
+    SqlServerWriteContext writeSqlServerContext
+) : IUserRepository
 {
-    private readonly SqlServerReadContext _readSqlServerContext;
+    private readonly SqlServerReadContext _readSqlServerContext = readSqlServerContext;
 
-    private readonly SqlServerWriteContext _writeSqlServerContext;
+    private readonly SqlServerWriteContext _writeSqlServerContext = writeSqlServerContext;
 
-    public UserRepository(
-        SqlServerReadContext readSqlServerContext,
-        SqlServerWriteContext writeSqlServerContext
-    )
-    {
-        _readSqlServerContext = readSqlServerContext;
-        _writeSqlServerContext = writeSqlServerContext;
-    }
-
-    public async Task CreateAsync(
-        UserModel model,
-        CancellationToken cancellationToken = default
-    )
+    public void Create(UserModel model)
     {
         try
         {
-            await _writeSqlServerContext.Users.AddAsync(model, cancellationToken);
+            _writeSqlServerContext.Users.Add(model);
         }
         catch (Exception) { }
     }

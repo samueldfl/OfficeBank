@@ -7,20 +7,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infra.Account.Repositories;
 
-internal sealed class AccountRepository : IAccountRepository
+internal sealed class AccountRepository(
+    SqlServerReadContext sqlServerReadContext,
+    SqlServerWriteContext sqlServerWriteContext
+) : IAccountRepository
 {
-    private readonly SqlServerReadContext _sqlServerReadContext;
+    private readonly SqlServerReadContext _sqlServerReadContext = sqlServerReadContext;
 
-    private readonly SqlServerWriteContext _sqlServerWriteContext;
-
-    public AccountRepository(
-        SqlServerReadContext sqlServerReadContext,
-        SqlServerWriteContext sqlServerWriteContext
-    )
-    {
-        _sqlServerReadContext = sqlServerReadContext;
-        _sqlServerWriteContext = sqlServerWriteContext;
-    }
+    private readonly SqlServerWriteContext _sqlServerWriteContext = sqlServerWriteContext;
 
     public async Task<AccountModel> ReadAccountAsync(
         Expression<Func<AccountModel, bool>> predicate,
@@ -36,7 +30,7 @@ internal sealed class AccountRepository : IAccountRepository
         return account;
     }
 
-    public async Task<AccountModel> ReadAccountAsNoTrackingAsync(
+    public async Task<AccountModel> ReadAsNoTrackingAsync(
         Expression<Func<AccountModel, bool>> predicate,
         CancellationToken cancellationToken = default
     )

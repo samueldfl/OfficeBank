@@ -10,7 +10,7 @@ public interface IAccountRepository
         CancellationToken cancellationToken = default
     );
 
-    Task<AccountModel> ReadAccountAsNoTrackingAsync(
+    Task<AccountModel> ReadAsNoTrackingAsync(
         Expression<Func<AccountModel, bool>> predicate,
         CancellationToken cancellationToken = default
     );

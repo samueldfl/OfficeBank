@@ -9,24 +9,17 @@ using Domain.User.Repositories;
 
 namespace Application.User.Handlers.Impl;
 
-public class CreateUserCommandHandler : ICreateUserCommandHandler
+public sealed class CreateUserCommandHandler(
+    IUserRepository userRepository,
+    IEncrypterService encrypterService,
+    IUnitOfWorkService unitOfWorkService
+) : ICreateUserCommandHandler
 {
-    private readonly IUserRepository _userRepository;
+    private readonly IUserRepository _userRepository = userRepository;
 
-    private readonly IEncrypterService _encrypterService;
+    private readonly IEncrypterService _encrypterService = encrypterService;
 
-    private readonly IUnitOfWorkService _unitOfWorkService;
-
-    public CreateUserCommandHandler(
-        IUserRepository userRepository,
-        IEncrypterService encrypterService,
-        IUnitOfWorkService unitOfWorkService
-    )
-    {
-        _userRepository = userRepository;
-        _encrypterService = encrypterService;
-        _unitOfWorkService = unitOfWorkService;
-    }
+    private readonly IUnitOfWorkService _unitOfWorkService = unitOfWorkService;
 
     public async Task<RootResult> HandleAsync(
         CreateUserCommand command,
@@ -44,7 +37,7 @@ public class CreateUserCommandHandler : ICreateUserCommandHandler
         {
             user.Password = _encrypterService.Hash(user.Password);
             user.CPF = _encrypterService.Hash(user.CPF);
-            await _userRepository.CreateAsync(user, cancellationToken);
+            _userRepository.Create(user);
             await _unitOfWorkService.CommitAsync(cancellationToken);
             return new RootCreatedResult();
         }
