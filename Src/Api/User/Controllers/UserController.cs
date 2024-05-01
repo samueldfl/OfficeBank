@@ -7,16 +7,13 @@ namespace Api.User.Controllers;
 
 [Route("Api/[controller]")]
 [ApiController]
-public sealed class UserController : ControllerBase
+public sealed class UserController(ICreateUserCommandHandler createUserCommandHandler)
+    : ControllerBase
 {
-    private readonly ICreateUserCommandHandler _createUserCommandHandler;
+    private readonly ICreateUserCommandHandler _createUserCommandHandler =
+        createUserCommandHandler;
 
-    public UserController(ICreateUserCommandHandler createUserCommandHandler)
-    {
-        _createUserCommandHandler = createUserCommandHandler;
-    }
-
-    [HttpPost("v{version:apiVersion}/register")]
+    [HttpPost("register")]
     public async Task<IActionResult> Register(
         CreateUserCommand command,
         CancellationToken cancellationToken

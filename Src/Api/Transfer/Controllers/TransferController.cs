@@ -11,20 +11,16 @@ namespace Api.Transfer.Controllers;
 
 [Route("[controller]")]
 [ApiController]
-public sealed class TransferController : ControllerBase
+public sealed class TransferController(
+    ICreateTransferCommandHandler createTransferCommandHandler,
+    IDepositCommandHandler depositCommandHandler
+) : ControllerBase
 {
-    private readonly ICreateTransferCommandHandler _createTransferCommandHandler;
+    private readonly ICreateTransferCommandHandler _createTransferCommandHandler =
+        createTransferCommandHandler;
 
-    private readonly IDepositCommandHandler _depositCommandHandler;
-
-    public TransferController(
-        ICreateTransferCommandHandler createTransferCommandHandler,
-        IDepositCommandHandler depositCommandHandler
-    )
-    {
-        _createTransferCommandHandler = createTransferCommandHandler;
-        _depositCommandHandler = depositCommandHandler;
-    }
+    private readonly IDepositCommandHandler _depositCommandHandler =
+        depositCommandHandler;
 
     [EnableRateLimiting("fixed")]
     [HttpPost("create-transfer")]
