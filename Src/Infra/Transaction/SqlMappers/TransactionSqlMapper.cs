@@ -1,4 +1,4 @@
-﻿using Domain.Payment.Models;
+﻿using Domain.Transaction.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

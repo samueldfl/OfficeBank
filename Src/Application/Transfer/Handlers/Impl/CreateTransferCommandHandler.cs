@@ -2,10 +2,10 @@ using Application.Shared.ResultStates;
 using Application.Transfer.Handlers.Abst;
 using Domain.Account.Models;
 using Domain.Account.Repositories;
-using Domain.Payment.Models;
-using Domain.Shared.Services.EventBus;
-using Domain.Shared.Services.UnitOfWork;
+using Domain.Services.EventBus;
+using Domain.Services.UnitOfWork;
 using Domain.Shared.ValidationStates;
+using Domain.Transaction.Models;
 using Domain.Transaction.Repositories;
 using Domain.Transfer.Commands;
 using Domain.Transfer.Models;
@@ -46,14 +46,16 @@ public sealed class CreateTransferCommandHandler(
 
         try
         {
+            Guid fromAccountId = Guid.Parse(command.FromAccountId);
+
             AccountModel fromAccount = await _accountRepository.ReadAsNoTrackingAsync(
-                account => account.Id == Guid.Parse(command.FromAccountId),
+                account => account.Id == fromAccountId,
                 cancellationToken
             );
 
             TransactionModel fromAccountLastTransaction =
                 await _transactionRepository.ReadLastAsNoTrackingAsync(
-                    account => account.AccountId == fromAccount.Id,
+                    transaction => transaction.AccountId == fromAccount.Id,
                     cancellationToken
                 );
 
@@ -65,8 +67,10 @@ public sealed class CreateTransferCommandHandler(
                 return new RootUnauthorizedResult();
             }
 
+            Guid toAccountId = Guid.Parse(command.ToAccountId);
+
             AccountModel toAccount = await _accountRepository.ReadAsNoTrackingAsync(
-                account => account.Id == Guid.Parse(command.ToAccountId),
+                account => account.Id == toAccountId,
                 cancellationToken
             );
 

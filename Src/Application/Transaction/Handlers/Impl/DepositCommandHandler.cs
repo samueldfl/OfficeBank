@@ -1,12 +1,11 @@
-﻿using Application.Shared.CommandHandlers;
-using Application.Shared.ResultStates;
+﻿using Application.Shared.ResultStates;
 using Application.Transaction.Commands;
 using Application.Transaction.Handlers.Abst;
 using Domain.Account.Models;
 using Domain.Account.Repositories;
-using Domain.Payment.Models;
-using Domain.Shared.Services.UnitOfWork;
+using Domain.Services.UnitOfWork;
 using Domain.Shared.ValidationStates;
+using Domain.Transaction.Models;
 using Domain.Transaction.Repositories;
 
 namespace Application.Transaction.Handlers.Impl;
@@ -32,21 +31,20 @@ internal sealed class DepositCommandHandler(
         ValidationState validation = command.Validate();
 
         if (validation is FailureValidationState)
-        {
             return new RootBadRequestResult();
-        }
 
         try
         {
-            AccountModel toAccount =
-                await _accountRepository.ReadAsNoTrackingAsync(
-                    account => account.Id == Guid.Parse(command.ToAccountId),
-                    cancellationToken
-                );
+            Guid toAccountId = Guid.Parse(command.ToAccountId);
+
+            AccountModel toAccount = await _accountRepository.ReadAsNoTrackingAsync(
+                account => account.Id == toAccountId,
+                cancellationToken
+            );
 
             TransactionModel lastTransaction =
                 await _transactionRepository.ReadLastAsNoTrackingAsync(
-                    account => account.Id == Guid.Parse(command.ToAccountId),
+                    transaction => transaction.AccountId == toAccountId,
                     cancellationToken
                 );
 

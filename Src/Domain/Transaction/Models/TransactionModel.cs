@@ -1,7 +1,7 @@
 ﻿using Domain.Account.Models;
 using Domain.Shared.Models;
 
-namespace Domain.Payment.Models;
+namespace Domain.Transaction.Models;
 
 public sealed class TransactionModel : BaseModel
 {

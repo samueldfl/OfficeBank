@@ -1,5 +1,5 @@
 ﻿using System.Linq.Expressions;
-using Domain.Payment.Models;
+using Domain.Transaction.Models;
 using Domain.Transaction.Repositories;
 using Infra.Shared.SqlServer.Context;
 using Microsoft.EntityFrameworkCore;

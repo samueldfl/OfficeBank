@@ -1,5 +1,5 @@
 ﻿using System.Linq.Expressions;
-using Domain.Payment.Models;
+using Domain.Transaction.Models;
 
 namespace Domain.Transaction.Repositories;
 

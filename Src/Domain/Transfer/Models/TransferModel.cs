@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations.Schema;
 using Domain.Shared.Models;
 
 namespace Domain.Transfer.Models;

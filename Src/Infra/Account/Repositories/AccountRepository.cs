@@ -16,7 +16,12 @@ internal sealed class AccountRepository(
 
     private readonly SqlServerWriteContext _sqlServerWriteContext = sqlServerWriteContext;
 
-    public async Task<AccountModel> ReadAccountAsync(
+    public void Create(AccountModel accountModel)
+    {
+        _sqlServerWriteContext.Accounts.Add(accountModel);
+    }
+
+    public async Task<AccountModel> ReadAsync(
         Expression<Func<AccountModel, bool>> predicate,
         CancellationToken cancellationToken = default
     )

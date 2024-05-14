@@ -15,13 +15,5 @@ public sealed class AccountSqlMapper : IEntityTypeConfiguration<AccountModel>
             .Property(account => account.Id)
             .HasColumnType("uniqueidentifier")
             .HasDefaultValueSql("NEWID()");
-
-        builder.HasIndex(p => p.UserId).IsUnique();
-        builder
-            .HasOne(account => account.User)
-            .WithOne(account => account.Account)
-            .HasForeignKey<AccountModel>(p => p.UserId);
-
-        builder.Navigation(account => account.Transactions).AutoInclude();
     }
 }

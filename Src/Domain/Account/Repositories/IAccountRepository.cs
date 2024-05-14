@@ -1,17 +1,10 @@
-using System.Linq.Expressions;
 using Domain.Account.Models;
+using Domain.Shared.Repositories.Create;
+using Domain.Shared.Repositories.Read;
 
 namespace Domain.Account.Repositories;
 
 public interface IAccountRepository
-{
-    Task<AccountModel> ReadAccountAsync(
-        Expression<Func<AccountModel, bool>> predicate,
-        CancellationToken cancellationToken = default
-    );
-
-    Task<AccountModel> ReadAsNoTrackingAsync(
-        Expression<Func<AccountModel, bool>> predicate,
-        CancellationToken cancellationToken = default
-    );
-}
+    : ICreateRepository<AccountModel>,
+        IRead<AccountModel>,
+        IReadAsNoTracking<AccountModel> { }
