@@ -1,7 +1,6 @@
 using Api.Settings;
 using Application.DI;
 using Infra.DI;
-using Infra.Services.Jwt.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
 
