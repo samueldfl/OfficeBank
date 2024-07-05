@@ -1,7 +1,7 @@
 using Api.Settings;
 using Application.DI;
-using Domain.Services.Jwt.Settings;
 using Infra.DI;
+using Infra.Services.Jwt.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,9 +13,7 @@ builder.Services.EnableApiVersioning().AddRequestRateLimit();
 
 builder.Services.ApplicationPersist().InfraPersist(builder.Configuration);
 
-builder.Services.AddJwtAuthentication(
-    builder.Configuration.GetSection(JwtSettings.Section).Get<JwtSettings>()!
-);
+builder.Services.AddJwtAuthentication(builder.Configuration);
 
 var app = builder.Build();
 

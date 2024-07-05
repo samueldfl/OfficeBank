@@ -1,5 +1,5 @@
 ﻿using System.Text;
-using Domain.Services.Jwt.Settings;
+using Infra.Services.Jwt.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
@@ -9,9 +9,13 @@ internal static class ApiAuthentication
 {
     public static IServiceCollection AddJwtAuthentication(
         this IServiceCollection services,
-        JwtSettings jwtSettings
+        IConfiguration configuration
     )
     {
+        JwtSettings jwtSettings = configuration
+            .GetSection(JwtSettings.Section)
+            .Get<JwtSettings>()!;
+            
         services
             .AddAuthentication(options =>
             {
