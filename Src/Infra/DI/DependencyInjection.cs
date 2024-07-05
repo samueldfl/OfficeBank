@@ -2,20 +2,19 @@
 using Domain.Services.Encrypter;
 using Domain.Services.EventBus;
 using Domain.Services.Jwt;
-using Domain.Services.Jwt.Settings;
 using Domain.Services.UnitOfWork;
 using Domain.Transaction.Repositories;
-using Domain.Transfer.Repositories;
 using Infra.Account.Repositories;
 using Infra.Services.Jwt;
+using Infra.Services.Jwt.Settings;
 using Infra.Services.Messengers.RabbitMQ.EventBus;
+using Infra.Services.Redis;
+using Infra.Services.SqlServer.Contexts;
+using Infra.Services.SqlServer.Settings;
+using Infra.Services.SqlServer.UnitOfWork;
 using Infra.Shared.Encrypter;
 using Infra.Shared.Messengers.RabbitMQ.Config;
-using Infra.Shared.SqlServer.Context;
-using Infra.Shared.SqlServer.Settings;
-using Infra.Shared.SqlServer.UnitOfWork;
 using Infra.Transaction.Repositories;
-using Infra.Transfer.Repositories;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,8 +28,17 @@ public static class DependencyInjection
         IConfiguration configuration
     )
     {
-        services.AddDbContext<SqlServerReadContext>();
         services.AddDbContext<SqlServerWriteContext>();
+        services.AddDbContext<SqlServerReadContext>();
+
+        services.AddStackExchangeRedisCache(options =>
+        {
+            var redisConnection = configuration
+                .GetSection(RedisConnectionString.Section)
+                .Get<RedisConnectionString>()!;
+
+            options.Configuration = redisConnection.ToString();
+        });
 
         services.AddSingleton(
             configuration
@@ -76,7 +84,6 @@ public static class DependencyInjection
         services.AddScoped<IJwtService, JwtService>();
 
         services.AddScoped<IAccountRepository, AccountRepository>();
-        services.AddScoped<ITransferRepository, TransferRepository>();
         services.AddScoped<ITransactionRepository, TransactionRepository>();
 
         return services;

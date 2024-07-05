@@ -1,4 +1,4 @@
-﻿namespace Domain.Services.Jwt.Settings;
+﻿namespace Infra.Services.Jwt.Settings;
 
 public sealed record JwtSettings(string Issuer, string Audience, string SecurityKey)
 {
