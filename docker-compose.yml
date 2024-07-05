@@ -1,0 +1,50 @@
+services:
+  mssql-server:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: mssql-server
+    restart: always
+    environment:
+      MSSQL_SA_PASSWORD: "@Password123"
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Developer"
+    ports:
+      - 1433:1433
+    volumes:
+      - mssql-data:/var/lib/mssql/data
+      - mssql-logs:/var/lib/mssql/log
+      - mssql-secrets:/var/lib/mssql/secrets
+    networks:
+      - dev
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: "guest"
+      RABBITMQ_DEFAULT_PASS: "guest"
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+
+  redis:
+    image: redis
+    container_name: redis-server
+    restart: always
+    command: redis-server --requirepass @Password123
+    ports:
+      - 6379:6379
+    volumes:
+      - redis-data:/var/lib/redis/data
+
+volumes:
+  mssql-data:
+  mssql-logs:
+  mssql-secrets:
+  rabbitmq-data:
+  redis-data:
+
+networks:
+  dev:
