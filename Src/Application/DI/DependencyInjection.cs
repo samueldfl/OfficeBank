@@ -2,8 +2,6 @@
 using Application.Account.Handlers.Impl;
 using Application.Transaction.Handlers.Abst;
 using Application.Transaction.Handlers.Impl;
-using Application.Transfer.Handlers.Abst;
-using Application.Transfer.Handlers.Impl;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Application.DI;
@@ -16,8 +14,12 @@ public static class DependencyInjection
             IRegisterAccountCommandHandler,
             RegisterAccountCommandHandler
         >();
-        services.AddScoped<ICreateTransferCommandHandler, CreateTransferCommandHandler>();
         services.AddScoped<IDepositCommandHandler, DepositCommandHandler>();
+        services.AddScoped<
+            IRegisterAccountCommandHandler,
+            RegisterAccountCommandHandler
+        >();
+        services.AddScoped<ILoginAccountCommandHandler, LoginAccountCommandHandler>();
 
         return services;
     }
