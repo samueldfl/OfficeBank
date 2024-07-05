@@ -1,10 +1,9 @@
 ﻿using Domain.Account.Models;
 using Domain.Transaction.Models;
-using Domain.Transfer.Models;
-using Infra.Shared.SqlServer.Settings;
+using Infra.Services.SqlServer.Settings;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infra.Shared.SqlServer.Context;
+namespace Infra.Services.SqlServer.Contexts;
 
 internal sealed class SqlServerReadContext(
     DbContextOptions<SqlServerReadContext> options,
@@ -17,33 +16,22 @@ internal sealed class SqlServerReadContext(
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(
-            typeof(SqlServerWriteContext).Assembly,
+            typeof(SqlServerReadContext).Assembly,
             WriteConfigurationsFilter
         );
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        bool isTesting = false;
-
-        if (isTesting)
-        {
-            optionsBuilder.UseInMemoryDatabase("");
-        }
-        else
-        {
-            optionsBuilder.UseSqlServer(_sqlServerConnectionString.ToString());
-        }
-
-        optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+        optionsBuilder
+            .UseSqlServer(_sqlServerConnectionString.ToString())
+            .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
     }
 
     private static bool WriteConfigurationsFilter(Type type) =>
-        type.FullName?.Contains("Configurations.Read") ?? false;
+        type.FullName?.Contains("SqlMappers.Read") ?? false;
 
     public DbSet<AccountModel> Accounts { get; set; }
-
-    public DbSet<TransferModel> Transfers { get; set; }
 
     public DbSet<TransactionModel> Transactions { get; set; }
 }

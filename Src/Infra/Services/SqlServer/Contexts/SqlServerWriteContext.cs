@@ -1,10 +1,9 @@
 using Domain.Account.Models;
 using Domain.Transaction.Models;
-using Domain.Transfer.Models;
-using Infra.Shared.SqlServer.Settings;
+using Infra.Services.SqlServer.Settings;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infra.Shared.SqlServer.Context;
+namespace Infra.Services.SqlServer.Contexts;
 
 internal sealed class SqlServerWriteContext(
     DbContextOptions<SqlServerWriteContext> options,
@@ -24,24 +23,13 @@ internal sealed class SqlServerWriteContext(
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        bool isTesting = false;
-
-        if (isTesting)
-        {
-            optionsBuilder.UseInMemoryDatabase("");
-        }
-        else
-        {
-            optionsBuilder.UseSqlServer(_sqlServerConnectionString.ToString());
-        }
+        optionsBuilder.UseSqlServer(_sqlServerConnectionString.ToString());
     }
 
     private static bool WriteConfigurationsFilter(Type type) =>
-        type.FullName?.Contains("Configurations.Write") ?? false;
+        type.FullName?.Contains("SqlMappers.Write") ?? false;
 
     public DbSet<AccountModel> Accounts { get; set; }
-
-    public DbSet<TransferModel> Transfers { get; set; }
 
     public DbSet<TransactionModel> Transactions { get; set; }
 }
